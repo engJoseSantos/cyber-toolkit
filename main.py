@@ -1,5 +1,5 @@
 # Author: José Santos
-# GitHub: https://github.com/yourusername
+# GitHub: https://github.com/engJoseSantos
 #
 # "Be sober-minded; be watchful. Your adversary the devil
 # prowls around like a roaring lion, seeking someone to devour."
@@ -17,18 +17,23 @@ headers = {
 }
 
 def get_unique_links(url):
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.text, "html.parser")
+    try:
+        response = requests.get(url, headers=headers)
+        soup = BeautifulSoup(response.text, "html.parser")
 
 
-    links = []
+        links = []
 
-    for a in soup.find_all("a"):
-        href = a.get("href")
-        if href:
-            links.append(href)
+        for a in soup.find_all("a"):
+            href = a.get("href")
+            if href:
+                links.append(href)
 
-    return set(links)
+        return set(links)
+    except requests.exceptions.RequestException as e:
+        print(f"Error requesting {url}: {e}")
+        return None
+
 
 def get_headers(url):
     try:
