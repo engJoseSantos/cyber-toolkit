@@ -1,3 +1,12 @@
+# Author: José Santos
+# GitHub: https://github.com/yourusername
+#
+# "Be sober-minded; be watchful. Your adversary the devil
+# prowls around like a roaring lion, seeking someone to devour."
+# — 1 Peter 5:8
+#
+# Stay alert. Stay secure.
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -21,8 +30,26 @@ def get_unique_links(url):
 
     return set(links)
 
+def get_headers(url):
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+
+        return response.headers
+    
+    except requests.exceptions.RequestException as e:
+        print(f"Error requesting {url}: {e}")
+        return None
+
 if __name__ == "__main__":
     url = input("Type the URL to find links: ")
-    unique_links = get_unique_links(url)
-    for link in unique_links:
-        print(link)
+    #unique_links = get_unique_links(url)
+    #for link in unique_links:
+    #    print(link)
+
+    response_headers = get_headers(url)
+
+    if response_headers:
+        print("\nHTTP Headers:")
+        for name, value in response_headers.items():
+            print(f"{name}: {value}")
