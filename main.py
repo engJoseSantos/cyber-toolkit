@@ -10,7 +10,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-#url = "https://nmap.org/"
+TIMEOUT = 10
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
@@ -18,13 +18,13 @@ headers = {
 
 def get_unique_links(url):
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=TIMEOUT)
         soup = BeautifulSoup(response.text, "html.parser")
 
 
         links = []
 
-        for a in soup.find_all("a"):
+        for a in soup.find_all("a", href=True):
             href = a.get("href")
             if href:
                 links.append(href)
@@ -37,7 +37,7 @@ def get_unique_links(url):
 
 def get_headers(url):
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers, timeout=TIMEOUT)
         response.raise_for_status()
 
         return response.headers
@@ -47,14 +47,18 @@ def get_headers(url):
         return None
 
 if __name__ == "__main__":
-    url = input("Type the URL to find links: ")
-    #unique_links = get_unique_links(url)
-    #for link in unique_links:
-    #    print(link)
+    url = input("Type the URL to find links: ").strip()
+    unique_links = get_unique_links(url)
 
-    response_headers = get_headers(url)
+    if unique_links:
+        print(f"Found {len(unique_links)} unique links")
 
-    if response_headers:
-        print("\nHTTP Headers:")
-        for name, value in response_headers.items():
-            print(f"{name}: {value}")
+        for link in unique_links:
+            print(link)
+
+    #response_headers = get_headers(url)
+
+    #if response_headers:
+    #    print("\nHTTP Headers:")
+    #    for name, value in response_headers.items():
+    #       print(f"{name}: {value}")
