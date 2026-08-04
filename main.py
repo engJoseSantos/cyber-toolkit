@@ -9,6 +9,7 @@
 
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 TIMEOUT = 10
 
@@ -26,8 +27,14 @@ def get_unique_links(url):
 
         for a in soup.find_all("a", href=True):
             href = a.get("href")
-            if href:
-                links.append(href)
+            #if ( not href or href.startswith("#") or href.startswith("mailto:") or href.startswith("javascript:") or href.startswith("tel:") ): 
+       
+            #else:
+            
+            #    links.append(href)
+
+            absolute_url = urljoin(url, href)
+            links.append(absolute_url)
 
         return set(links)
     except requests.exceptions.RequestException as e:
