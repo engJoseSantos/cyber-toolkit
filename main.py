@@ -9,7 +9,7 @@
 
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 TIMEOUT = 10
 
@@ -41,6 +41,24 @@ def get_unique_links(url):
         print(f"Error requesting {url}: {e}")
         return None
 
+def classify_links(links):
+    web_links = []
+    other_links = []
+
+    for href in links:
+
+        if href.startswith(("mailto:", "tel:", "javascript:", "#")):
+            other_links.append(href)
+            continue
+
+        parsed_url = urlparse(href)
+
+        if parsed_url.scheme in ("http", "https"):
+            web_links.append(href)
+        else:
+            other_links.append(href)
+
+    return web_links, other_links
 
 def get_headers(url):
     try:
@@ -60,7 +78,16 @@ if __name__ == "__main__":
     if unique_links:
         print(f"Found {len(unique_links)} unique links")
 
-        for link in unique_links:
+        #for link in unique_links:
+        #    print(link)
+        web_links, other_links = classify_links(unique_links)
+
+        print("\nWeb Links:")
+        for link in web_links:
+            print(link)
+
+        print("\nOther Links:")
+        for link in other_links:
             print(link)
 
     #response_headers = get_headers(url)
