@@ -75,33 +75,78 @@ def get_headers(url):
         print(f"Error requesting {url}: {e}")
         return None
 
+        
+def main():
+    while True:
+        print("\n=== Cyber Tool ===")
+        print("1. Get unique links")
+        print("2. Classify links")
+        print("3. Get headers")
+        print("4. Exit")
+
+        choice = input("\nChoose an option: ").strip()
+
+        if choice == "1":
+            url = input("Enter URL: ").strip()
+
+            if not is_valid_url(url):
+                print("Invalid URL.")
+                continue
+
+            links = get_unique_links(url)
+
+            if links is not None:
+                print(f"\nFound {len(links)} unique links:")
+
+                for link in sorted(links):
+                    print(f" - {link}")
+
+        elif choice == "2":
+            url = input("Enter URL: ").strip()
+
+            if not is_valid_url(url):
+                print("Invalid URL.")
+                continue
+
+            links = get_unique_links(url)
+
+            if links is None:
+                continue
+
+            web_links, other_links = classify_links(links)
+
+            print(f"\nWeb links ({len(web_links)}):")
+
+            for link in sorted(web_links):
+                print(f" - {link}")
+
+            print(f"\nOther links ({len(other_links)}):")
+
+            for link in sorted(other_links):
+                print(f" - {link}")
+
+        elif choice == "3":
+            url = input("Enter URL: ").strip()
+
+            if not is_valid_url(url):
+                print("Invalid URL.")
+                continue
+
+            response_headers = get_headers(url)
+
+            if response_headers is not None:
+                print("\nHTTP Headers:")
+
+                for key, value in response_headers.items():
+                    print(f" - {key}: {value}")
+
+        elif choice == "4":
+            print("Exiting...")
+            break
+
+        else:
+            print("Invalid option. Please choose 1-4.")
+
+
 if __name__ == "__main__":
-    url = input("Type the URL to find links: ").strip()
-    #unique_links = get_unique_links(url)
-
-    #if unique_links:
-     #   print(f"Found {len(unique_links)} unique links")
-
-        #for link in unique_links:
-        #    print(link)
-      #  web_links, other_links = classify_links(unique_links)
-
-       # print("\nWeb Links:")
-       # for link in web_links:
-       #     print(link)
-
-        #print("\nOther Links:")
-        #for link in other_links:
-         #   print(link) 
-
-    if is_valid_url(url):
-        print("good link")
-    else:
-        print("bad link")      
-
-    #response_headers = get_headers(url)
-
-    #if response_headers:
-    #    print("\nHTTP Headers:")
-    #    for name, value in response_headers.items():
-    #       print(f"{name}: {value}")
+    main()
