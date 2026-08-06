@@ -17,6 +17,15 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 }
 
+def is_valid_url(url: str) -> bool:
+
+    if not url or not isinstance(url, str):
+        return False
+    
+    parsed = urlparse(url) 
+
+    return (parsed.scheme in ("http", "https") and bool(parsed.hostname))
+
 def get_unique_links(url):
     try:
         response = requests.get(url, headers=headers, timeout=TIMEOUT)
@@ -27,11 +36,6 @@ def get_unique_links(url):
 
         for a in soup.find_all("a", href=True):
             href = a.get("href")
-            #if ( not href or href.startswith("#") or href.startswith("mailto:") or href.startswith("javascript:") or href.startswith("tel:") ): 
-       
-            #else:
-            
-            #    links.append(href)
 
             absolute_url = urljoin(url, href)
             links.append(absolute_url)
@@ -73,22 +77,27 @@ def get_headers(url):
 
 if __name__ == "__main__":
     url = input("Type the URL to find links: ").strip()
-    unique_links = get_unique_links(url)
+    #unique_links = get_unique_links(url)
 
-    if unique_links:
-        print(f"Found {len(unique_links)} unique links")
+    #if unique_links:
+     #   print(f"Found {len(unique_links)} unique links")
 
         #for link in unique_links:
         #    print(link)
-        web_links, other_links = classify_links(unique_links)
+      #  web_links, other_links = classify_links(unique_links)
 
-        print("\nWeb Links:")
-        for link in web_links:
-            print(link)
+       # print("\nWeb Links:")
+       # for link in web_links:
+       #     print(link)
 
-        print("\nOther Links:")
-        for link in other_links:
-            print(link)
+        #print("\nOther Links:")
+        #for link in other_links:
+         #   print(link) 
+
+    if is_valid_url(url):
+        print("good link")
+    else:
+        print("bad link")      
 
     #response_headers = get_headers(url)
 
