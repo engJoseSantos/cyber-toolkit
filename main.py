@@ -8,6 +8,7 @@
 # Stay alert. Stay secure.
 
 import requests
+from ui_utils import *
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 
@@ -26,24 +27,29 @@ def is_valid_url(url: str) -> bool:
 
     return (parsed.scheme in ("http", "https") and bool(parsed.hostname))
 
-def get_unique_links(url):
+def make_request(url):
     try:
         response = requests.get(url, headers=headers, timeout=TIMEOUT)
-        soup = BeautifulSoup(response.text, "html.parser")
+        print(f"[{response.status_code}] {response.reason} - {url}\n")
 
-
-        links = []
-
-        for a in soup.find_all("a", href=True):
-            href = a.get("href")
-
-            absolute_url = urljoin(url, href)
-            links.append(absolute_url)
-
-        return set(links)
+        return response
     except requests.exceptions.RequestException as e:
         print(f"Error requesting {url}: {e}")
         return None
+
+def get_unique_links(response, url):
+    soup = BeautifulSoup(response.text, "html.parser")
+
+
+    links = []
+
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+
+        absolute_url = urljoin(url, href)
+        links.append(absolute_url)
+
+    return set(links)
 
 def classify_links(links):
     web_links = []
@@ -64,9 +70,8 @@ def classify_links(links):
 
     return web_links, other_links
 
-def get_headers(url):
+def get_headers(response):
     try:
-        response = requests.get(url, headers=headers, timeout=TIMEOUT)
         response.raise_for_status()
 
         return response.headers
@@ -75,10 +80,11 @@ def get_headers(url):
         print(f"Error requesting {url}: {e}")
         return None
 
-        
+
 def main():
     while True:
-        print("\n=== Cyber Tool ===")
+        print_title("Cyber Tool")
+        print_warning()
         print("1. Get unique links")
         print("2. Classify links")
         print("3. Get headers")
@@ -92,8 +98,12 @@ def main():
             if not is_valid_url(url):
                 print("Invalid URL.")
                 continue
+            response = make_request(url)
 
-            links = get_unique_links(url)
+            if response is None:
+                continue
+
+            links = get_unique_links(response, url)
 
             if links is not None:
                 print(f"\nFound {len(links)} unique links:")
@@ -107,8 +117,12 @@ def main():
             if not is_valid_url(url):
                 print("Invalid URL.")
                 continue
+            response = make_request(url)
 
-            links = get_unique_links(url)
+            if response is None:
+                continue
+
+            links = get_unique_links(response, url)
 
             if links is None:
                 continue
@@ -132,7 +146,13 @@ def main():
                 print("Invalid URL.")
                 continue
 
-            response_headers = get_headers(url)
+            response = make_request(url)
+
+            if response is None:
+                continue
+
+
+            response_headers = get_headers(response)
 
             if response_headers is not None:
                 print("\nHTTP Headers:")
