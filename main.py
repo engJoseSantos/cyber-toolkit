@@ -51,9 +51,12 @@ def get_unique_links(response, url):
 
     return set(links)
 
-def classify_links(links):
-    web_links = []
+def classify_links(links, base_url):
+    internal_links = []
+    external_links = []
     other_links = []
+
+    base_domain = urlparse(base_url).netloc
 
     for href in links:
 
@@ -64,11 +67,16 @@ def classify_links(links):
         parsed_url = urlparse(href)
 
         if parsed_url.scheme in ("http", "https"):
-            web_links.append(href)
+
+            if parsed_url.netloc == base_domain:
+                internal_links.append(href)
+            else:
+                external_links.append(href)
+
         else:
             other_links.append(href)
 
-    return web_links, other_links
+    return internal_links, external_links, other_links
 
 def get_headers(response):
     return response.headers
