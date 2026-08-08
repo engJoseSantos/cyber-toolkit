@@ -71,15 +71,44 @@ def classify_links(links):
     return web_links, other_links
 
 def get_headers(response):
-    try:
-        response.raise_for_status()
-
-        return response.headers
+    return response.headers
     
-    except requests.exceptions.RequestException as e:
-        print(f"Error requesting {url}: {e}")
-        return None
 
+def detect_technologies(response):
+    technologies = set()
+
+    html = response.text.lower()
+    response_headers = {key.lower(): value.lower() for key, value in response.headers.items()}
+
+    # Server
+    if "server" in response_headers:
+        technologies.add(response_headers["server"])
+
+    # X-Powered-By
+    if "x-powered-by" in response_headers:
+        technologies.add(response_headers["x-powered-by"])
+
+    # WordPress
+    if "wp-content" in html or "wp-includes" in html:
+        technologies.add("WordPress")
+
+    # Bootstrap
+    if "bootstrap" in html:
+        technologies.add("Bootstrap")
+
+    # jQuery
+    if "jquery" in html:
+        technologies.add("jQuery")
+
+    # React
+    if "react" in html or "__react" in html:
+        technologies.add("React")
+
+    # Vue
+    if "vue" in html:
+        technologies.add("Vue.js")
+
+    return technologies
 
 def main():
     while True:
@@ -88,7 +117,8 @@ def main():
         print("1. Get unique links")
         print("2. Classify links")
         print("3. Get headers")
-        print("4. Exit")
+        print("4. Get technologies")
+        print("5. Exit")
 
         choice = input("\nChoose an option: ").strip()
 
@@ -160,12 +190,32 @@ def main():
                 for key, value in response_headers.items():
                     print(f" - {key}: {value}")
 
+
         elif choice == "4":
+            url = input("Enter URL: ").strip()
+
+            if not is_valid_url(url):
+                print("Invalid URL.")
+                continue
+
+            response = make_request(url)
+
+            if response is None:
+                continue
+
+            technologies = detect_technologies(response)
+
+            print("\nTechnologies:")
+
+            for technology in sorted(technologies):
+                print(f" - {technology}")
+
+        elif choice == "5":
             print("Exiting...")
             break
 
         else:
-            print("Invalid option. Please choose 1-4.")
+            print("Invalid option. Please choose 1-5.")
 
 
 if __name__ == "__main__":
