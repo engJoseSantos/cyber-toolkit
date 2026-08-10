@@ -165,11 +165,16 @@ def main():
             if links is None:
                 continue
 
-            web_links, other_links = classify_links(links)
+            internal_links, external_links, other_links = classify_links(links, url)
 
-            print(f"\nWeb links ({len(web_links)}):")
+            print(f"\nInternal links ({len(internal_links)}):")
 
-            for link in sorted(web_links):
+            for link in sorted(internal_links):
+                print(f" - {link}")
+
+            print(f"\nExternal links ({len(external_links)}):")
+
+            for link in sorted(external_links):
                 print(f" - {link}")
 
             print(f"\nOther links ({len(other_links)}):")
