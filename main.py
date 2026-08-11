@@ -118,6 +118,39 @@ def detect_technologies(response):
 
     return technologies
 
+def analyze_robots_txt(url):
+    robots_url = urljoin(url, "/robots.txt")
+
+    try:
+        response = requests.get(
+            robots_url,
+            headers=headers,
+            timeout=TIMEOUT
+        )
+
+        if response.status_code != 200:
+            return response.status_code, [], []
+
+        directives = []
+        sitemaps = []
+
+        for line in response.text.splitlines():
+            line = line.strip()
+
+            if not line or line.startswith("#"):
+                continue
+
+            if line.lower().startswith(("user-agent:", "allow:", "disallow:")):
+                directives.append(line)
+
+            elif line.lower().startswith("sitemap:"):
+                sitemaps.append(line)
+
+        return response.status_code, directives, sitemaps
+
+    except requests.exceptions.RequestException:
+        return None, [], []
+
 def main():
     while True:
         print_title("Cyber Tool")
