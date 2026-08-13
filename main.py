@@ -40,14 +40,17 @@ def make_request(url):
 def get_unique_links(response, url):
     soup = BeautifulSoup(response.text, "html.parser")
 
-
     links = []
 
     for a in soup.find_all("a", href=True):
         href = a.get("href")
 
         absolute_url = urljoin(url, href)
-        links.append(absolute_url)
+
+        parsed_url = urlparse(absolute_url)
+        clean_url = parsed_url._replace(fragment="").geturl()
+
+        links.append(clean_url)
 
     return set(links)
 
